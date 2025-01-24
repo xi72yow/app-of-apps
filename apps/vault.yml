@@ -6,18 +6,23 @@ metadata:
   #   argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   destination:
-    name: ''
+    name: ""
     namespace: default
-    server: 'https://kubernetes.default.svc'
+    server: "https://kubernetes.default.svc"
   # syncPolicy:
   #   syncOptions:
   #   - Replace=true
   source:
     path: umbrella-chart
-    repoURL: 'https://github.com/xi72yow/app-of-apps'
+    repoURL: "https://github.com/xi72yow/app-of-apps"
     targetRevision: HEAD
     helm:
-      valuesFiles:
-        - vault.yaml
+      values: |
+        server:
+          affinity: ""
+          ha:
+            enabled: true
+            raft: 
+              enabled: true
   sources: []
   project: default
