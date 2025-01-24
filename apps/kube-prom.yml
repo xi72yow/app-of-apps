@@ -2,22 +2,193 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: kube-prometheus
-  # annotations:
-  #   argocd.argoproj.io/sync-options: ServerSideApply=true
 spec:
   destination:
     name: ""
     namespace: monitoring
     server: "https://kubernetes.default.svc"
-  # syncPolicy:
-  #   syncOptions:
-  #   - Replace=true
   source:
     path: umbrella-chart
     repoURL: "https://github.com/xi72yow/app-of-apps"
     targetRevision: HEAD
     helm:
-      valuesFiles:
-        - /apps/kube-prom.yaml
-  sources: []
+      values: |
+        nameOverride: ""
+        namespaceOverride: ""
+        kubeTargetVersionOverride: ""
+        kubeVersionOverride: ""
+        fullnameOverride: ""
+        commonLabels: {}
+
+        defaultRules:
+          create: true
+          rules:
+            alertmanager: true
+            etcd: true
+            configReloaders: true
+            general: true
+            k8s: true
+            kubeApiserverAvailability: true
+            kubeApiserverBurnrate: true
+            kubeApiserverHistogram: true
+            kubeApiserverSlos: true
+            kubeControllerManager: true
+            kubelet: true
+            kubeProxy: true
+            kubePrometheusGeneral: true
+            kubePrometheusNodeRecording: true
+            kubernetesApps: true
+            kubernetesResources: true
+            kubernetesStorage: true
+            kubernetesSystem: true
+            kubeSchedulerAlerting: true
+            kubeSchedulerRecording: true
+            kubeStateMetrics: true
+            network: true
+            node: true
+            nodeExporterAlerting: true
+            nodeExporterRecording: true
+            prometheus: true
+            prometheusOperator: true
+          appNamespacesTarget: ".*"
+
+          labels: {}
+          annotations: {}
+          additionalRuleLabels: {}
+          additionalRuleAnnotations: {}
+          additionalRuleGroupLabels:
+            alertmanager: {}
+            etcd: {}
+            configReloaders: {}
+            general: {}
+            k8s: {}
+            kubeApiserverAvailability: {}
+            kubeApiserverBurnrate: {}
+            kubeApiserverHistogram: {}
+            kubeApiserverSlos: {}
+            kubeControllerManager: {}
+            kubelet: {}
+            kubeProxy: {}
+            kubePrometheusGeneral: {}
+            kubePrometheusNodeRecording: {}
+            kubernetesApps: {}
+            kubernetesResources: {}
+            kubernetesStorage: {}
+            kubernetesSystem: {}
+            kubeSchedulerAlerting: {}
+            kubeSchedulerRecording: {}
+            kubeStateMetrics: {}
+            network: {}
+            node: {}
+            nodeExporterAlerting: {}
+            nodeExporterRecording: {}
+            prometheus: {}
+            prometheusOperator: {}
+
+          additionalRuleGroupAnnotations:
+            alertmanager: {}
+            etcd: {}
+            configReloaders: {}
+            general: {}
+            k8s: {}
+            kubeApiserverAvailability: {}
+            kubeApiserverBurnrate: {}
+            kubeApiserverHistogram: {}
+            kubeApiserverSlos: {}
+            kubeControllerManager: {}
+            kubelet: {}
+            kubeProxy: {}
+            kubePrometheusGeneral: {}
+            kubePrometheusNodeRecording: {}
+            kubernetesApps: {}
+            kubernetesResources: {}
+            kubernetesStorage: {}
+            kubernetesSystem: {}
+            kubeSchedulerAlerting: {}
+            kubeSchedulerRecording: {}
+            kubeStateMetrics: {}
+            network: {}
+            node: {}
+            nodeExporterAlerting: {}
+            nodeExporterRecording: {}
+            prometheus: {}
+            prometheusOperator: {}
+
+          runbookUrl: "https://runbooks.prometheus-operator.dev/runbooks"
+          disabled: {}
+        additionalPrometheusRulesMap: {}
+
+        global:
+          rbac:
+            create: true
+            createAggregateClusterRoles: false
+            pspEnabled: false
+            pspAnnotations: {}
+          imageRegistry: ""
+          imagePullSecrets: []
+
+        alertmanager:
+          enabled: true
+          annotations: {}
+          apiVersion: v2
+          serviceAccount:
+            create: true
+            name: ""
+            annotations: {}
+            automountServiceAccountToken: true
+          podDisruptionBudget:
+            enabled: false
+            minAvailable: 1
+            maxUnavailable: ""
+          config:
+            global:
+              resolve_timeout: 5m
+            inhibit_rules:
+              - source_matchers:
+                  - "severity = critical"
+                target_matchers:
+                  - "severity =~ warning|info"
+                equal:
+                  - "namespace"
+                  - "alertname"
+              - source_matchers:
+                  - "severity = warning"
+                target_matchers:
+                  - "severity = info"
+                equal:
+                  - "namespace"
+                  - "alertname"
+              - source_matchers:
+                  - "alertname = InfoInhibitor"
+                target_matchers:
+                  - "severity = info"
+                equal:
+                  - "namespace"
+            route:
+              group_by: ["namespace"]
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 12h
+              receiver: "null"
+              routes:
+                - receiver: "null"
+                  matchers:
+                    - alertname =~ "InfoInhibitor|Watchdog"
+            receivers:
+              - name: "null"
+            templates:
+              - "/etc/alertmanager/config/*.tmpl"
+          stringConfig: ""
+          tplConfig: false
+          templateFiles: {}
+          ingress:
+            enabled: false
+            annotations: {}
+            labels: {}
+            hosts: []
+            paths: []
+            tls: []
+          secret:
+            annotations: {}
+
   project: default
