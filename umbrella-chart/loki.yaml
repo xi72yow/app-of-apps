@@ -7,7 +7,6 @@ loki:
   enabled: true
   isDefault: true
 
-
 promtail:
   enabled: true
   config:

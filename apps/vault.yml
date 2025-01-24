@@ -14,7 +14,7 @@ spec:
   #   - Replace=true
   source:
     path: umbrella-chart
-    repoURL: 'https://github.com/philcz16/app-of-apps'
+    repoURL: 'https://github.com/xi72yow/app-of-apps'
     targetRevision: HEAD
     helm:
       valuesFiles:
