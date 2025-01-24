@@ -18,6 +18,6 @@ spec:
     targetRevision: HEAD
     helm:
       valuesFiles:
-        - kube-prom.yaml
+        - /apps/kube-prom.yaml
   sources: []
   project: default
